@@ -1,5 +1,4 @@
-import axios from 'axios';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 import { Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,25 +11,27 @@ import Spiner from './Loader/Loader';
 import Modal from './Modal/Modal';
 import React, { useState, useEffect } from 'react';
 
-axios.defaults.baseURL = 'https://pixabay.com/api/';
-
 function App() {
   // static propTypes = { searchQuery: PropTypes.string };
-  const [searchQuery, setSearchQuery] = useState('')
-  const [images, setImages] = useState([])
-  const [page, setPage] = useState(1)
-  const [selectedImage, setSelectedImage] = useState(null)
-  const [alt, setAlt] = useState(null)
-  const [status, setStatus] = useState('idle')
-  const [error, setError] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('');
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [alt, setAlt] = useState(null);
+  const [status, setStatus] = useState('idle');
+  const [error] = useState(null);
 
   // totalHits = null;
-  
- const [totalHits, setTotalHits] = useState(null);
+
+  const [totalHits, setTotalHits] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (searchQuery !== '' && (searchQuery !== prevState.searchQuery || page !== prevState.page)) {
+      if (
+        searchQuery !== ''
+        // &&
+        // (searchQuery !== searchQuery || page !== page)
+      ) {
         setStatus('pending');
 
         try {
@@ -63,52 +64,57 @@ function App() {
     fetchData();
   }, [searchQuery, page]);
 
- const handleFormSubmit = (searchQuery) => {
-    if (searchQuery === searchQuery) {
-      return;
-    }
+  const handleFormSubmit = searchQuery => {
+    //   if (searchQuery === searchQuery) {
+    //     return;
+    //   }
     resetState();
     setSearchQuery(searchQuery);
   };
-// }
 
   const handleSelectedImage = (largeImageUrl, tags) => {
-      setSelectedImage(largeImageUrl),
-      setAlt(tags),
+    setSelectedImage(largeImageUrl);
+    setAlt(tags);
   };
 
+  const resetState = () => {
+    setSearchQuery('');
+    setPage(1);
+    setImages([]);
+    setSelectedImage(null);
+    setAlt(null);
+    setStatus('idle');
+  };
 
+  const loadMore = () => {
+    setPage(prevPage => prevPage + 1);
+  };
 
-
- const resetState = () => {
-   setSearchQuery('');
-   setPage(1);
-   setImages([]);
-   setSelectedImage(null);
-   setAlt(null);
-   setStatus('idle');
-    };
-
- const loadMore = () => {
-      setPage(prevState => prevState + 1),
-    };
-
-const closeModal = () => {
+  const closeModal = () => {
     setSelectedImage(null);
   };
 
-return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 40,
-        color: '#010101'
-      }}
-    >
-      React homework template
-    </div>
+  return (
+    <AppContainer>
+      <Searchbar onSubmit={handleFormSubmit} />
+      <ToastContainer autoClose={3000} theme="colored" pauseOnHover />
+      {status === 'pending' && <Spiner />}
+      {error && (
+        <h1 style={{ color: 'orangered', textAlign: 'center' }}>
+          {error.message}
+        </h1>
+      )}
+      {images.length > 0 && (
+        <ImageGallery images={images} selectedImage={handleSelectedImage} />
+      )}
+      {images.length > 0 && images.length !== totalHits && (
+        <LoadMoreButton onClick={loadMore} />
+      )}
+      {selectedImage && (
+        <Modal selectedImage={selectedImage} tags={alt} onClose={closeModal} />
+      )}
+    </AppContainer>
   );
-};
+}
+// const { images, status, selectedImage, alt, error } = this.state;
+export default App;
