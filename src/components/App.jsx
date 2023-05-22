@@ -20,7 +20,7 @@ const App = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [alt, setAlt] = useState(null);
   const [status, setStatus] = useState('idle');
-  const [error, setError] = useState(null);
+  const [error] = useState(null);
   let totalHits = null;
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const App = () => {
 
       try {
         const imageData = await fetchApi(searchQuery, page);
-        totalHits = imageData.total;
+        // totalHits = imageData.total;
         const imagesHits = imageData.hits;
         if (!imagesHits.length) {
           toast.warning(
