@@ -1,4 +1,6 @@
-// import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 import { Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -9,67 +11,62 @@ import { AppContainer } from './App.styled';
 import fetchApi from '../components/ApiService/ApiService';
 import Spiner from './Loader/Loader';
 import Modal from './Modal/Modal';
-import React, { useState, useEffect } from 'react';
+axios.defaults.baseURL = 'https://pixabay.com/api/';
 
-function App() {
-  // static propTypes = { searchQuery: PropTypes.string };
+const App = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [images, setImages] = useState([]);
   const [page, setPage] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
   const [alt, setAlt] = useState(null);
   const [status, setStatus] = useState('idle');
-  const [error] = useState(null);
-
-  // totalHits = null;
-
-  const [totalHits, setTotalHits] = useState(null);
+  const [error, setError] = useState(null);
+  let totalHits = null;
 
   useEffect(() => {
     const fetchData = async () => {
-      if (
-        searchQuery !== ''
-        // &&
-        // (searchQuery !== searchQuery || page !== page)
-      ) {
-        setStatus('pending');
+      if (searchQuery.trim() === '') return;
 
-        try {
-          const imageData = await fetchApi(searchQuery, page);
-          setTotalHits(imageData.total);
-          const imagesHits = imageData.hits;
-          if (!imagesHits.length) {
-            toast.warning(
-              'No results were found for your search, please try something else.',
-              { transition: Zoom, position: 'top-center' }
-            );
-          }
-          setImages(prevImages => [...prevImages, ...imagesHits]);
-          setStatus('resolved');
+      setStatus('pending');
 
-          if (page > 1) {
-            const CARD_HEIGHT = 300; // preview image height
-            window.scrollBy({
-              top: CARD_HEIGHT * 2,
-              behavior: 'smooth',
-            });
-          }
-        } catch (error) {
-          toast.error(`Sorry something went wrong. ${error.message}`);
-          setStatus('rejected');
+      try {
+        const imageData = await fetchApi(searchQuery, page);
+        totalHits = imageData.total;
+        const imagesHits = imageData.hits;
+        if (!imagesHits.length) {
+          toast.warning(
+            'No results were found for your search, please try something else.',
+            { transition: Zoom, position: 'top-center' }
+          );
         }
+        setImages(prevImages => [...prevImages, ...imagesHits]);
+        setStatus('resolved');
+      } catch (error) {
+        toast.error(`Sorry something went wrong. ${error.message}`);
+        setStatus('rejected');
       }
     };
 
     fetchData();
   }, [searchQuery, page]);
 
-  const handleFormSubmit = searchQuery => {
-    //   if (searchQuery === searchQuery) {
-    //     return;
-    //   }
+  useEffect(() => {
+    if (page > 1 && images.length > 0) {
+      const CARD_HEIGHT = 300; // preview image height
+      const scrollHeight = CARD_HEIGHT * 2;
+      window.scrollBy({
+        top: scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [images, page]);
+
+  const handleFormSubmit = newSearchQuery => {
+    if (searchQuery === newSearchQuery) {
+      return;
+    }
     resetState();
-    setSearchQuery(searchQuery);
+    setSearchQuery(newSearchQuery);
   };
 
   const handleSelectedImage = (largeImageUrl, tags) => {
@@ -115,6 +112,10 @@ function App() {
       )}
     </AppContainer>
   );
-}
-// const { images, status, selectedImage, alt, error } = this.state;
+};
+
+App.propTypes = {
+  searchQuery: PropTypes.string,
+};
+
 export default App;

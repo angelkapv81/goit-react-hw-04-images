@@ -1,23 +1,24 @@
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Search } from '@mui/icons-material';
-import { useState } from 'react';
 
 import PropTypes from 'prop-types';
 import {
-  // Searchbar,
+  Searchbar,
   SerchForm,
   Input,
   SearchBtn,
   SerchFormBtnLabel,
 } from './Serchbar.styled';
 
-const Searchbar = ({ onSubmit }) => {
+const Searhbar = ({ onSubmit }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleChange = e => {
     setSearchQuery(e.currentTarget.value.toLowerCase());
   };
+
   const handleSubmit = e => {
     e.preventDefault();
     if (searchQuery.trim() === '') {
@@ -36,7 +37,7 @@ const Searchbar = ({ onSubmit }) => {
           autoComplete="off"
           autoFocus
           placeholder="Search images ..."
-          name="searchQuery"
+          name="serchQuery"
           value={searchQuery}
           onChange={handleChange}
         />
@@ -51,7 +52,8 @@ const Searchbar = ({ onSubmit }) => {
 };
 
 // propTypes
-Searchbar.propTypes = {
+Searhbar.propTypes = {
   onSubmit: PropTypes.func,
 };
-export default Searchbar;
+
+export default Searhbar;
