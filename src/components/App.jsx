@@ -105,7 +105,7 @@ const App = () => {
       {images.length > 0 && (
         <ImageGallery images={images} selectedImage={handleSelectedImage} />
       )}
-      {images.length > 0 && images.length <= totalHitsRef.current && (
+      {images.length > 0 && images.length !== totalHitsRef.current && (
         <LoadMoreButton onClick={loadMore} />
       )}
       {selectedImage && (
