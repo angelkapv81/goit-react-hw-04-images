@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
@@ -21,7 +21,8 @@ const App = () => {
   const [alt, setAlt] = useState(null);
   const [status, setStatus] = useState('idle');
   const [error] = useState(null);
-  let totalHits = null;
+
+  const totalHitsRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,7 +32,7 @@ const App = () => {
 
       try {
         const imageData = await fetchApi(searchQuery, page);
-        // totalHits = imageData.total;
+        totalHitsRef.current = imageData.totalHits;
         const imagesHits = imageData.hits;
         if (!imagesHits.length) {
           toast.warning(
@@ -104,7 +105,7 @@ const App = () => {
       {images.length > 0 && (
         <ImageGallery images={images} selectedImage={handleSelectedImage} />
       )}
-      {images.length > 0 && images.length !== totalHits && (
+      {images.length > 0 && images.length <= totalHitsRef.current && (
         <LoadMoreButton onClick={loadMore} />
       )}
       {selectedImage && (
